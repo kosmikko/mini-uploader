@@ -6,12 +6,17 @@ requirejs.config({
   // Specify the paths of vendor libraries
   paths: {
     jquery: 'vendor/jquery-1.8.3',
-    underscore: 'vendor/underscore-1.4.3'
+    underscore: 'vendor/underscore-1.4.3',
+    backbone: 'vendor/backbone'
   },
 
   shim: {
     underscore: {
       exports: '_'
+    },
+    backbone: {
+      deps: ['underscore', 'jquery'],
+      exports: 'Backbone'
     }
   },
 

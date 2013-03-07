@@ -11,6 +11,7 @@
     "mocha": "1.7.4",
     "expect.js": "0.2.0",
     "jshint": "*",
-    "mocha-phantomjs": "2.0.0"
+    "mocha-phantomjs": "2.0.0",
+    "express": "3.1.0"
   }
 }

@@ -1,4 +1,10 @@
-# amd-plugin-example
+# mini-uploader
+
+Yet another JS upload plugin. Aimed to be minimalistic and easily extensible.
+
+## Setup
+
+    npm install
 
 ## Running tests
 

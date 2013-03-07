@@ -1,4 +1,6 @@
 require(['uploader/upload'], function (Upload) {
-  var upload = new Upload();
-  upload.initialize();
+  var uploadOpts = {
+    sendPath: '/upload',
+  };
+  var upload = new Upload(uploadOpts);
 });
