@@ -1,0 +1,16 @@
+{
+  "name": "PluginName",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Mikko Lehtinen",
+  "private": true,
+  "dependencies": {
+    "requirejs": "2.1.1"
+  },
+  "devDependencies": {
+    "mocha": "1.7.4",
+    "expect.js": "0.2.0",
+    "jshint": "*",
+    "mocha-phantomjs": "2.0.0"
+  }
+}
