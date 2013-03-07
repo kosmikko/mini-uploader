@@ -1,7 +1,8 @@
 define([
   'underscore',
-  './emitter'
-], function(_, Emitter) {
+  './emitter',
+  './imageprocessor'
+], function(_, Emitter, ImageProcessor) {
   'use strict';
 
   var Upload = function(options) {this.initialize(options)};
@@ -22,6 +23,10 @@ define([
   Upload.prototype.sendFile = function(file, callback) {
     var self = this;
     this.callback = callback;
+
+    ImageProcessor.createThumbnail(file, function(thumb) {
+      console.log(thumb);
+    }, {thumbnailWidth: 200, thumbnailHeight: 200});
 
     var req = this.req = new XMLHttpRequest();
     req.open('POST', this.sendPath);
