@@ -16,12 +16,13 @@ define([
   Upload.prototype.initialize = function(options) {
     this.options = options;
     this.sendPath = options.sendPath;
-    this.callback = options.callback;
     this.headers = options.headers || {};
   }
 
-  Upload.prototype.sendFile = function(file) {
+  Upload.prototype.sendFile = function(file, callback) {
     var self = this;
+    this.callback = callback;
+
     var req = this.req = new XMLHttpRequest();
     req.open('POST', this.sendPath);
     // set xhr headers if any
@@ -34,7 +35,7 @@ define([
     req.upload.onprogress = this.onprogress.bind(this);
     req.onreadystatechange = function() {
       if (req.readyState === 4) {
-        self.onreadystatechange(req);
+        self.onreadystatechange(req, callback);
       }
     };
 

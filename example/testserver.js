@@ -6,7 +6,7 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 
 app.get('/', function(req, res) {
-  res.sendfile('test/index.html');
+  res.sendfile('example/index.html');
 });
 
 app.post('/upload', function(req, res) {
