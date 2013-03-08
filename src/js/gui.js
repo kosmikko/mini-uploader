@@ -11,7 +11,16 @@ define([
 
   var UploadGUI = function(options) {this.initialize(options)};
 
+  UploadGUI.prototype.defaultOptions = {
+    messages: {
+      success: 'Uploaded successfully.'
+    },
+    progressBarSelector: '.progress .bar',
+    progressStatusSelector: '.progress-status'
+  };
+
   UploadGUI.prototype.initialize = function(options) {
+    this.options = _.extend(this.defaultOptions, options);
     this.input = document.getElementById(options.inputId);
     this.fileInput = $('#' + options.inputId);
     this.uploadBtn = $(options.uploadButton);
@@ -34,11 +43,13 @@ define([
       var upload = new Upload(self.uploadOptions);
 
       upload.sendFile(file, function(err, res) {
-        console.log(err, res);
+        if(err) {
+          return self._setStatusText(err.message);
+        }
+        return self._setStatusText(self.options.messages.success);
       });
 
       upload.on('progress', _.bind(self._updateProgress, self));
-
       upload.on('thumbnail', _.bind(self._showThumbnail, self));
     });
 
@@ -54,11 +65,15 @@ define([
   };
 
   UploadGUI.prototype._updateProgress = function(e) {
-    var progressBar = this.previewContainer.find('.progress .bar');
+    var progressBar = this.previewContainer.find(this.options.progressBarSelector);
     progressBar.css({width: e.percent + "%"});
-    var progressStatus = this.previewContainer.find('.progress-status');
-    progressStatus.html(e.percent + "%");
+    this._setStatusText(e.percent + "%");
   };
+
+  UploadGUI.prototype._setStatusText = function(text) {
+    var progressStatus = this.previewContainer.find(this.options.progressStatusSelector);
+    progressStatus.html(text);
+  }
 
   return UploadGUI;
 });
