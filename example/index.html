@@ -14,7 +14,16 @@
         <h2>Select file</h2>
 
         <form action="http://localhost:4000/upload" method="post" class="well">
-          <input id="file" type="file" />
+          <input id="file" type="file" class="hide" />
+          <a class="btn btn-info" id="upload-btn" href="#">Select file</a>
+          <div id="preview" class="hide">
+            <img src="" class="preview-img thumbnail">
+            <div class="progress progress-striped">
+              <div class="bar" style="width: 0%;"></div>
+            </div>
+            <div class="progress-status">
+            </div>
+          </div>
         </form>
       </div>
     </div>

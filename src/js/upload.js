@@ -25,7 +25,7 @@ define([
     this.callback = callback;
 
     ImageProcessor.createThumbnail(file, function(thumb) {
-      console.log(thumb);
+      self.trigger('thumbnail', thumb);
     }, {thumbnailWidth: 200, thumbnailHeight: 200});
 
     var req = this.req = new XMLHttpRequest();
