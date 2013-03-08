@@ -1,5 +1,5 @@
 define([
-  'uploader/upload',
+  'upload',
 ], function(Upload) {
   "use strict";
 
