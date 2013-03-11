@@ -26,7 +26,8 @@ define([
     this.trigger('start', file);
 
     var req = this.req = new XMLHttpRequest();
-    req.open('POST', this.sendPath);
+    var method = this.options.method;
+    req.open(method, this.sendPath, true);
     // set xhr headers if any
     _.map(this.headers, function(val, key) {
         req.setRequestHeader(key, val)
@@ -41,9 +42,13 @@ define([
       }
     };
 
-    var body = new FormData;
-    body.append('file', file);
-    req.send(body);
+    if(method === 'POST') {
+      var body = new FormData;
+      body.append('file', file);
+      req.send(body);
+    } else {
+      req.send(file);
+    }
   }
 
   Upload.prototype.onreadystatechange = function(req) {
@@ -62,7 +67,7 @@ define([
   };
 
   Upload.prototype.onprogress = function(e){
-    e.percent = e.loaded / e.total * 100;
+    e.percent = Math.round(e.loaded / e.total * 100);
     this.trigger('progress', e);
   };
 

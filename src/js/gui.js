@@ -6,9 +6,10 @@ define([
   'underscore',
   'jquery',
   './upload',
+  './s3_upload',
   './imageprocessor',
   './emitter'
-], function(_, $, Upload, ImageProcessor, Emitter) {
+], function(_, $, Upload, S3Upload, ImageProcessor, Emitter) {
   'use strict';
 
   var UploadGUI = function(options) {this.initialize(options)};
@@ -22,7 +23,10 @@ define([
     progressSelector: '.progress',
     progressBarSelector: '.progress .bar',
     progressStatusSelector: '.progress-status',
-    createImageThumbnails: true
+    createImageThumbnails: true,
+    method: 'POST',
+    s3SignUrl: '/signurl',
+    useS3: true
   };
 
   UploadGUI.prototype.initialize = function(options) {
@@ -39,7 +43,9 @@ define([
     this.progressContainer = this.previewContainer.find(this.options.progressSelector);
 
     this.uploadOptions = {
-      sendPath: options.sendPath
+      sendPath: this.options.sendPath,
+      method: this.options.method,
+      s3SignUrl: this.options.s3SignUrl
     };
 
     this._setupEvents();
@@ -50,9 +56,19 @@ define([
     this.input.addEventListener('change', function() {
       var file = self.input.files[0];
       self._createThumbnail(file);
-      var upload = new Upload(self.uploadOptions);
 
-      upload.sendFile(file, function(err, res) {
+      var upload,
+          uploadFn;
+
+      if(self.options.useS3) {
+        upload = new S3Upload(self.uploadOptions);
+        uploadFn = _.bind(upload.uploadToS3, upload);
+      } else {
+        upload = new Upload(self.uploadOptions);
+        uploadFn = _.bind(upload.sendFile, upload)
+      }
+
+      uploadFn(file, function(err, res) {
         if(err) {
           return self._setStatusText(err.message);
         }

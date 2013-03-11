@@ -5,3 +5,4 @@ dev-build/
 node_modules
 .DS_Store
 reports
+example/app.config.json

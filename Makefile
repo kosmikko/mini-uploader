@@ -4,6 +4,6 @@ test:
 	@$(MOCHA-PHANTOMJS) test/index.html spec
 
 example:
-	@node example/testserver
+	@node example/app
 
 .PHONY: test example

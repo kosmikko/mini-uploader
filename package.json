@@ -5,7 +5,8 @@
   "author": "Mikko Lehtinen",
   "private": true,
   "dependencies": {
-    "requirejs": "2.1.1"
+    "requirejs": "2.1.1",
+    "nconf": "0.6.7"
   },
   "devDependencies": {
     "mocha": "1.7.4",
