@@ -56,7 +56,8 @@ define([
     this.input.addEventListener('change', function() {
       var file = self.input.files[0];
       self._createThumbnail(file);
-
+      self.progressContainer.show();
+      self._updateProgress({percent: 0});
       var upload,
           uploadFn;
 

@@ -36,6 +36,7 @@ exports.signURL = function(options) {
     };
     //       {"success_action_redirect": successRedirect},
     //       {"x-amz-meta-filename": options.filename},
+    //          [ 'content-length-range', 0, 10490000 ],
     return new Buffer(JSON.stringify(policyJSON)).toString('base64');
   }
   var expires = new Date();
