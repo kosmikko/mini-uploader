@@ -39,9 +39,6 @@ exports.signURL = function(options) {
     //          [ 'content-length-range', 0, 10490000 ],
     return new Buffer(JSON.stringify(policyJSON)).toString('base64');
   }
-  var expires = new Date();
-  expires.setMinutes(expires.getMinutes() + expiresInMinutes);
-  var epo = Math.floor(expires.getTime()/1000);
 
   var policy = createPolicy();
   var signature = hmacSha1(policy);
