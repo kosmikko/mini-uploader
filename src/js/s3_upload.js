@@ -16,6 +16,18 @@ define([
     this.options.method = 'POST';
   }
 
+  S3Upload.prototype.onreadystatechange = function(req) {
+    if (req.status === 204) {
+      var res = {
+        fileURI: this.publicUrl
+      };
+      return this._notifyListeners(null, res);
+    }
+    var err = new Error(req.statusText + ': ' + req.response);
+    err.status = req.status;
+    this._notifyListeners(err);
+  };
+
   S3Upload.prototype.getSignUrl = function(file, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', this.options.s3SignUrl + '?filename=' + file.name + '&contenttype=' + file.type, true);
@@ -38,7 +50,7 @@ define([
     this.getSignUrl(file, function(err, signedData) {
       if(err) return callback(err);
       self.sendPath = signedData.url;
-      console.log(signedData);
+      self.publicUrl = signedData.publicUrl;
       self.sendFile(file, signedData.fields, callback);
     });
   }

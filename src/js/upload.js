@@ -55,7 +55,7 @@ define([
   }
 
   Upload.prototype.onreadystatechange = function(req) {
-    if (req.status === 200 || req.status === 204) return this._notifyListeners(null, req)
+    if (req.status === 200) return this._notifyListeners(null, req)
     var err = new Error(req.statusText + ': ' + req.response);
     err.status = req.status;
     this._notifyListeners(err);

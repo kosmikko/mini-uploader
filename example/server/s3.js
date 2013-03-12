@@ -11,7 +11,9 @@ exports.signURL = function(options) {
       acl = options.acl || 'public-read',
       expiresInMinutes = options.expiresInMinutes || 5,
       filename = options.filename,
-      contentType = options.contentType;
+      objectName = (options.path || '') + filename,
+      contentType = options.contentType,
+      bucketUrl = protocol + '://'+ bucket + '.' + endpoint;
 
   if(!filename) throw new Error("Filename was missing");
 
@@ -29,7 +31,7 @@ exports.signURL = function(options) {
         {"bucket": config.get('amazon_s3_bucket')},
         {"acl": acl},
         ["starts-with", "$Content-Type", contentType],
-        ["starts-with", "$key", filename],
+        ["starts-with", "$key", objectName],
       ]
     };
     //       {"success_action_redirect": successRedirect},
@@ -44,7 +46,8 @@ exports.signURL = function(options) {
   var signature = hmacSha1(policy);
 
   return {
-    url: protocol + '://'+ bucket + '.' + endpoint,
+    url: bucketUrl,
+    publicUrl: bucketUrl + '/' + objectName,
     fields: {
       key: filename,
       AWSAccessKeyId: aws_key,

@@ -73,7 +73,8 @@ define([
           return self._setStatusText(err.message);
         }
         self.progressContainer.hide();
-        return self._setStatusText(self.options.messages.success);
+        var fileURI = res.fileURI;
+        return self._setStatusText(self.options.messages.success + ':' + fileURI);
       });
       self.previewContainer.show('slow');
 
@@ -109,7 +110,7 @@ define([
   UploadGUI.prototype._setStatusText = function(text) {
     var progressStatus = this.previewContainer.find(this.options.progressStatusSelector);
     progressStatus.html(text);
-  }
+  };
 
   return UploadGUI;
 });
