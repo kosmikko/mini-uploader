@@ -1,33 +1,58 @@
 var crypto = require('crypto');
+var moment = require('moment');
 var config = require('./config');
 
 exports.signURL = function(options) {
-  var acl = 'public-read';
-  var successRedirect = '/';
-  var s3_url = 'http://' + config.get('amazon_s3_bucket') + '.s3.amazonaws.com/';
-  var expiration = new Date(new Date().getTime() + 1000 * 60 * 5).getTime();
+  var endpoint = options.host || 's3.amazonaws.com',
+      protocol = options.protocol || 'http',
+      bucket = config.get('amazon_s3_bucket'),
+      aws_secret = config.get('amazon_secret'),
+      aws_key = config.get('amazon_key'),
+      acl = options.acl || 'public-read',
+      expiresInMinutes = options.expiresInMinutes || 5,
+      filename = options.filename,
+      contentType = options.contentType;
 
-  var policyJSON = {
-    "expiration": expiration,
-    "conditions": [
-      {"bucket": config.get('amazon_s3_bucket')},
-      {"acl": acl},
-      {"success_action_status": "200"}
-    ]
+  if(!filename) throw new Error("Filename was missing");
+
+  var hmacSha1 = function (message) {
+    return crypto.createHmac('sha1', aws_secret)
+                 .update(message)
+                 .digest('base64');
   };
-  //       {"success_action_redirect": successRedirect},
-  //      ["starts-with", "$Content-Type", options.contentType]
-  //       ["starts-with", "$key", "key/"],
-  //       {"x-amz-meta-filename": options.filename},
-  var secret = config.get('amazon_secret');
-  var policyBase64 = new Buffer(JSON.stringify(policyJSON)).toString('base64');
-  var shasum = crypto.createHash('sha1', secret);
-  shasum.update(policyBase64);
-  var signature = shasum.digest('base64');
 
-  return s3_url +
-      '?AWSAccessKeyId=' + config.get('amazon_key') +
-      '&expires=' + expiration +
-      '&key=' + options.objectName +
-      '&signature=' + signature;
+  var createPolicy = function() {
+    // NB: all post fields must be specified in the policy json
+    var policyJSON = {
+      "expiration": moment().add('minutes', expiresInMinutes).utc().format('YYYY-MM-DDTHH:mm:ss') + 'Z',
+      "conditions": [
+        {"bucket": config.get('amazon_s3_bucket')},
+        {"acl": acl},
+        ["starts-with", "$Content-Type", contentType],
+        ["starts-with", "$key", filename],
+      ]
+    };
+    //       {"success_action_redirect": successRedirect},
+    //       {"x-amz-meta-filename": options.filename},
+    return new Buffer(JSON.stringify(policyJSON)).toString('base64');
+  }
+  var expires = new Date();
+  expires.setMinutes(expires.getMinutes() + expiresInMinutes);
+  var epo = Math.floor(expires.getTime()/1000);
+
+  var policy = createPolicy();
+  var signature = hmacSha1(policy);
+
+  return {
+    url: protocol + '://'+ bucket + '.' + endpoint,
+    fields: {
+      key: filename,
+      AWSAccessKeyId: aws_key,
+      acl: acl,
+      'Content-Type': contentType,
+      policy: policy,
+      signature: signature
+    }
+  };
 };
+

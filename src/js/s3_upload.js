@@ -13,16 +13,16 @@ define([
 
   S3Upload.prototype.initialize = function(options) {
     Upload.prototype.initialize.apply(this, [options]);
-    this.options.method = 'PUT';
+    this.options.method = 'POST';
   }
 
   S3Upload.prototype.getSignUrl = function(file, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', this.options.s3SignUrl + '?filename=' + file.name + '&contenttype=' + file.type, true);
-
+    xhr.overrideMimeType('text/plain; charset=x-user-defined');
     xhr.onreadystatechange = function(e) {
       if (this.readyState == 4 && this.status == 200) {
-        callback(null, decodeURIComponent(this.responseText));
+        callback(null, JSON.parse(this.responseText));
       }
       else if(this.readyState == 4 && this.status != 200) {
         callback(new Error('Could sign request. Status: ' + this.status));
@@ -34,12 +34,12 @@ define([
 
   S3Upload.prototype.uploadToS3 = function(file, callback) {
     var self = this;
-    this.headers['Content-Type'] = file.type;
     this.headers['x-amz-acl'] = 'public-read';
-    this.getSignUrl(file, function(err, url) {
+    this.getSignUrl(file, function(err, signedData) {
       if(err) return callback(err);
-      self.sendPath = url;
-      self.sendFile(file, callback);
+      self.sendPath = signedData.url;
+      console.log(signedData);
+      self.sendFile(file, signedData.fields, callback);
     });
   }
 

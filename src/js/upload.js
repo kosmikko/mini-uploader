@@ -19,7 +19,7 @@ define([
     this.headers = options.headers || {};
   }
 
-  Upload.prototype.sendFile = function(file, callback) {
+  Upload.prototype.sendFile = function(file, fields, callback) {
     var self = this;
     this.callback = callback;
 
@@ -44,6 +44,9 @@ define([
 
     if(method === 'POST') {
       var body = new FormData;
+      _.each(fields, function(val, key) {
+        body.append(key, val);
+      });
       body.append('file', file);
       req.send(body);
     } else {
@@ -52,7 +55,7 @@ define([
   }
 
   Upload.prototype.onreadystatechange = function(req) {
-    if (req.status === 200) return this._notifyListeners(null, req)
+    if (req.status === 200 || req.status === 204) return this._notifyListeners(null, req)
     var err = new Error(req.statusText + ': ' + req.response);
     err.status = req.status;
     this._notifyListeners(err);
