@@ -17,40 +17,30 @@ define(['backbone'
     },
 
     _processImage: function(img, callback, options) {
-      var canvas = document.createElement("canvas"),
-          ctx = canvas.getContext("2d");
-      canvas.width = 200;
-      canvas.height = options.thumbnailHeight;
+      var canvas = document.createElement("canvas");
 
-      var srcWidth = img.width,
-          srcHeight = img.height,
-          srcX = 0,
-          srcY = 0,
-          trgX = 0,
-          trgY = 0,
-          trgWidth = canvas.width,
-          trgHeight = canvas.height,
-          srcRatio = img.width / img.height,
-          trgRatio = canvas.width / canvas.height,
-          self = this;
-
-      if (img.height < canvas.height || img.width < canvas.width) {
-        trgHeight = srcHeight;
-        trgWidth = srcWidth;
-      } else {
-        if (srcRatio > trgRatio) {
-          srcHeight = img.height;
-          srcWidth = srcHeight * trgRatio;
-        } else {
-          srcWidth = img.width;
-          srcHeight = srcWidth / trgRatio;
-        }
+      var scale = Math.max(
+        (options.minWidth || img.width) / img.width,
+        (options.minHeight || img.height) / img.height
+      );
+      if (scale > 1) {
+        img.width = parseInt(img.width * scale, 10);
+        img.height = parseInt(img.height * scale, 10);
       }
-      srcX = (img.width - srcWidth) / 2;
-      srcY = (img.height - srcHeight) / 2;
-      trgY = (canvas.height - trgHeight) / 2;
-      trgX = (canvas.width - trgWidth) / 2;
-      ctx.drawImage(img, srcX, srcY, srcWidth, srcHeight, trgX, trgY, trgWidth, trgHeight);
+      scale = Math.min(
+        (options.maxWidth || img.width) / img.width,
+        (options.maxHeight || img.height) / img.height
+      );
+      if (scale < 1) {
+        img.width = parseInt(img.width * scale, 10);
+        img.height = parseInt(img.height * scale, 10);
+      }
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, img.width, img.height);
       var thumbnail = canvas.toDataURL("image/png");
       callback(thumbnail);
     }

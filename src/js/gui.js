@@ -26,7 +26,11 @@ define([
     createImageThumbnails: true,
     method: 'POST',
     s3SignUrl: '/signurl',
-    useS3: true
+    useS3: true,
+    thumbnailOptions: {
+      maxWidth: 200,
+      maxHeight: 200
+    }
   };
 
   UploadGUI.prototype.initialize = function(options) {
@@ -94,7 +98,7 @@ define([
     if (this.options.createImageThumbnails && file.type.match(/image.*/)) {
       ImageProcessor.createThumbnail(file, function(thumb) {
         self.trigger('thumbnail', thumb);
-      }, {thumbnailWidth: 200, thumbnailHeight: 200});
+      }, self.options.thumbnailOptions);
     }
   };
 
